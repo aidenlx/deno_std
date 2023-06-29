@@ -115,6 +115,10 @@ export type StringifyOptions = {
    * @default {false}
    */
   bom?: boolean;
+  /**
+   * @default {true}
+   */
+  crlf?: boolean;
 };
 
 const QUOTE = '"';
@@ -278,7 +282,7 @@ function getValuesFromItem(
  */
 export function stringify(
   data: DataItem[],
-  { headers = true, separator: sep = ",", columns = [], bom = false }:
+  { headers = true, separator: sep = ",", columns = [], bom = false, crlf = true }:
     StringifyOptions = {},
 ): string {
   if (sep.includes(QUOTE) || sep.includes(CRLF)) {
@@ -297,11 +301,13 @@ export function stringify(
     output += BYTE_ORDER_MARK;
   }
 
+  const linebreak = crlf ? CRLF : LF;
+
   if (headers) {
     output += normalizedColumns
       .map((column) => getEscapedString(column.header, sep))
       .join(sep);
-    output += CRLF;
+    output += linebreak;
   }
 
   for (const item of data) {
@@ -309,7 +315,7 @@ export function stringify(
     output += values
       .map((value) => getEscapedString(value, sep))
       .join(sep);
-    output += CRLF;
+    output += linebreak;
   }
 
   return output;

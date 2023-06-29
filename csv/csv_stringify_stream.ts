@@ -15,6 +15,10 @@ export interface CsvStringifyStreamOptions {
    * If you want to stream objects, this option is required.
    */
   readonly columns?: Array<string>;
+  /**
+   * @default {true}
+   */
+  readonly crlf?: boolean;
 }
 
 /**
@@ -48,6 +52,7 @@ export class CsvStringifyStream<TOptions extends CsvStringifyStreamOptions>
     const {
       separator,
       columns = [],
+      crlf = true
     } = options ?? {};
 
     super(
@@ -56,7 +61,7 @@ export class CsvStringifyStream<TOptions extends CsvStringifyStreamOptions>
           if (columns && columns.length > 0) {
             try {
               controller.enqueue(
-                stringify([columns], { separator, headers: false }),
+                stringify([columns], { separator, headers: false, crlf }),
               );
             } catch (error) {
               controller.error(error);
@@ -66,7 +71,7 @@ export class CsvStringifyStream<TOptions extends CsvStringifyStreamOptions>
         transform(chunk, controller) {
           try {
             controller.enqueue(
-              stringify([chunk], { separator, headers: false, columns }),
+              stringify([chunk], { separator, headers: false, columns, crlf }),
             );
           } catch (error) {
             controller.error(error);
